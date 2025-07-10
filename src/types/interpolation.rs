@@ -210,6 +210,16 @@ impl InterpType {
     pub fn akima_periodic() -> InterpType {
         ffi_wrap!(gsl_interp_akima_periodic)
     }
+
+    /// Steffen’s method guarantees the monotonicity of the interpolating function between the given
+    /// data points. Therefore, minima and maxima can only occur exactly at the data points, and
+    /// there can never be spurious oscillations between data points. The interpolated function is
+    /// piecewise cubic in each interval. The resulting curve and its first derivative are
+    /// guaranteed to be continuous, but the second derivative may be discontinuous.
+    #[doc(alias = "gsl_interp_steffen")]
+    pub fn steffen() -> InterpType {
+        ffi_wrap!(gsl_interp_steffen)
+    }
 }
 
 ffi_wrapper!(
