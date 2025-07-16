@@ -27,6 +27,7 @@ pub use self::filter::{
 };
 pub use self::histograms::{Histogram, Histogram2D, Histogram2DPdf, HistogramPdf};
 pub use self::interpolation::{Interp, InterpAccel, InterpType, Spline};
+pub use self::interpolation2d::{Interp2d, Interp2dType, Spline2d};
 pub use self::mathieu::MathieuWorkspace;
 pub use self::matrix::{
     MatrixF32, MatrixF32View, MatrixF64, MatrixF64View, MatrixI32, MatrixI32View, MatrixU32,

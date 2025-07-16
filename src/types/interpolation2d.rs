@@ -125,3 +125,14 @@ impl Interp2dType {
         ffi_wrap!(gsl_interp2d_bicubic)
     }
 }
+
+ffi_wrapper!(
+    Spline2d,
+    *mut sys::gsl_spline2d,
+    gsl_spline2d_free,
+    "General interpolation object."
+);
+
+impl Spline2d {
+    // TODO
+}
