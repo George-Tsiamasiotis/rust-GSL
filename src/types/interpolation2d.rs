@@ -66,6 +66,40 @@ impl Interp2d {
         };
         Error::handle(ret, ())
     }
+
+    /// This function returns the name of the interpolation type used by interp. For example,
+    ///
+    /// ```
+    /// use crate::rgsl::{Interp2d, Interp2dType};
+    ///
+    /// let interp2d_type = Interp2dType::bilinear();
+    /// let interp2d = Interp2d::new(interp2d_type, 2, 2).expect("Failed to initialize `Interp2d`...");
+    /// println!("interp uses '{}' interpolation.", interp.name());
+    /// ```
+    ///
+    /// would print something like :
+    ///
+    /// ```Shell
+    /// interp uses 'bilinear' interpolation.
+    /// ```
+    #[doc(alias = "gsl_interp2d_name")]
+    pub fn name(&self) -> String {
+        let tmp = unsafe { sys::gsl_interp2d_name(self.unwrap_shared()) };
+
+        if tmp.is_null() {
+            String::new()
+        } else {
+            unsafe { String::from_utf8_lossy(std::ffi::CStr::from_ptr(tmp).to_bytes()).to_string() }
+        }
+    }
+
+    /// This function returns the minimum number of points required by the interpolation object
+    /// interp or interpolation type T. For example, bicubic interpolation requires a minimum
+    /// of 4 points.
+    #[doc(alias = "gsl_interp_min_size")]
+    pub fn min_size(&self) -> usize {
+        unsafe { sys::gsl_interp2d_min_size(self.unwrap_shared()) }
+    }
 }
 
 ffi_wrapper!(Interp2dType, *const sys::gsl_interp2d_type);
