@@ -104,4 +104,24 @@ impl Interp2d {
 
 ffi_wrapper!(Interp2dType, *const sys::gsl_interp2d_type);
 
-impl Interp2dType {}
+impl Interp2dType {
+    /// This function returns the minimum number of points required by the interpolation object
+    /// interp or interpolation type T. For example, bicubic interpolation requires a minimum
+    /// of 4 points.
+    #[doc(alias = "gsl_interp2d_type_min_size")]
+    pub fn min_size(&self) -> usize {
+        unsafe { sys::gsl_interp2d_type_min_size(self.unwrap_shared()) }
+    }
+
+    /// Bilinear interpolation. This interpolation method does not require any additional memory.
+    #[doc(alias = "gsl_interp2d_bilinear")]
+    pub fn bilinear() -> Interp2dType {
+        ffi_wrap!(gsl_interp2d_bilinear)
+    }
+
+    /// Bicubib interpolation.
+    #[doc(alias = "gsl_interp2d_bicubic")]
+    pub fn bicubic() -> Interp2dType {
+        ffi_wrap!(gsl_interp2d_bicubic)
+    }
+}
