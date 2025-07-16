@@ -80,6 +80,7 @@ pub mod fast_fourier_transforms;
 pub mod filter;
 pub mod histograms;
 pub mod interpolation;
+pub mod interpolation2d;
 pub mod mathieu;
 pub mod matrix;
 pub mod matrix_complex;

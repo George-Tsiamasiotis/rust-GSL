@@ -47,6 +47,7 @@ pub mod filter;
 pub mod fit;
 pub mod integration;
 pub mod interpolation;
+pub mod interpolation2d;
 pub mod linear_algebra;
 pub mod minimizer;
 pub mod multifit;
