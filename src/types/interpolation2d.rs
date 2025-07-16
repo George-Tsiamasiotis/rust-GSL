@@ -9,12 +9,26 @@ Given a set of x coordinates x_1, ..., x_m and a set of y coordinates y_1, ..., 
 order, plus a set of function values z_ij for each grid point (x_i, x_j), the routines described in this
 section compute a continuous interpolation function z(x,y) such that z(x_i, y_j) = z_ij.
 
+# 2d Interpolation algorithms
+
+The 2d Interpolation routines access the function values z_ij with the following ordering:
+
+        z_ij = za[j*xsize + i]
+
+with i=0,...,xsize-1, and j=0,...,ysize-1. However, for ease of use, the functions [`set`], [`get`] and [`idx`]
+are provided to add and retrieve elements from the function grid without requiring knowledge of the internal
+ordering.
+
 ## References and Further Reading
 
 Descriptions of the interpolation algorithms and further references can be found in the following books:
 
 C.W. Ueberhuber, Numerical Computation (Volume 1), Chapter 9 “Interpolation”, Springer (1997), ISBN 3-540-62058-3.
 D.M. Young, R.T. Gregory A Survey of Numerical Mathematics (Volume 1), Chapter 6.8, Dover (1988), ISBN 0-486-65691-8.
+
+[`set`]: #method.set.html
+[`get`]: #method.get.html
+[`idx`]: #method.idx.html
 !*/
 
 use crate::ffi::FFI;
@@ -96,9 +110,28 @@ impl Interp2d {
     /// This function returns the minimum number of points required by the interpolation object
     /// interp or interpolation type T. For example, bicubic interpolation requires a minimum
     /// of 4 points.
-    #[doc(alias = "gsl_interp_min_size")]
+    #[doc(alias = "gsl_interp2d_min_size")]
     pub fn min_size(&self) -> usize {
         unsafe { sys::gsl_interp2d_min_size(self.unwrap_shared()) }
+    }
+
+    /// This function sets the value z_ij for grid point (i,j) of the array za to z.
+    #[doc(alias = "gsl_interp2d_set")]
+    pub fn set(&mut self, za: &mut [f64], i: usize, j: usize, z: f64) {
+        unsafe { sys::gsl_interp2d_set(self.unwrap_shared(), za.as_mut_ptr(), i, j, z) };
+    }
+
+    /// This function returns the value z_ij for grid point (i,j) stored in the array za.
+    #[doc(alias = "gsl_interp2d_set")]
+    pub fn get(&mut self, za: &mut [f64], i: usize, j: usize) -> f64 {
+        unsafe { sys::gsl_interp2d_get(self.unwrap_shared(), za.as_mut_ptr(), i, j) }
+    }
+
+    /// This function returns the index corresponding to the grid point (i,j). The index is given by
+    /// z*xsize + i.
+    #[doc(alias = "gsl_interp2d_set")]
+    pub fn idx(&mut self, i: usize, j: usize) -> usize {
+        unsafe { sys::gsl_interp2d_idx(self.unwrap_shared(), i, j) }
     }
 }
 
@@ -197,7 +230,7 @@ impl Spline2d {
         Error::handle(ret, z)
     }
 
-    #[doc(alias = "gsl_spline2d_eval")]
+    #[doc(alias = "gsl_spline2d_eval_extrap")]
     pub fn eval_extrap(
         &self,
         x: f64,
@@ -246,7 +279,7 @@ impl Spline2d {
         }
     }
 
-    /// Returns `z`.
+    /// Returns `d`.
     #[doc(alias = "gsl_spline2d_eval_deriv_x_e")]
     pub fn eval_extrap_deriv_x_e(
         &self,
@@ -282,7 +315,7 @@ impl Spline2d {
         }
     }
 
-    /// Returns `z`.
+    /// Returns `d`.
     #[doc(alias = "gsl_spline2d_eval_deriv_y_e")]
     pub fn eval_extrap_deriv_y_e(
         &self,
@@ -318,7 +351,7 @@ impl Spline2d {
         }
     }
 
-    /// Returns `z`.
+    /// Returns `d`.
     #[doc(alias = "gsl_spline2d_eval_deriv_xx_e")]
     pub fn eval_extrap_deriv_xx_e(
         &self,
@@ -411,5 +444,17 @@ impl Spline2d {
             )
         };
         Error::handle(ret, d)
+    }
+
+    /// This function sets the value z_ij for grid point (i,j) of the array za to z.
+    #[doc(alias = "gsl_spline2d_set")]
+    pub fn set(&mut self, za: &mut [f64], i: usize, j: usize, z: f64) {
+        unsafe { sys::gsl_spline2d_set(self.unwrap_shared(), za.as_mut_ptr(), i, j, z) };
+    }
+
+    /// This function returns the value z_ij for grid point (i,j) stored in the array za.
+    #[doc(alias = "gsl_interp2d_set")]
+    pub fn get(&mut self, za: &mut [f64], i: usize, j: usize) -> f64 {
+        unsafe { sys::gsl_spline2d_get(self.unwrap_shared(), za.as_mut_ptr(), i, j) }
     }
 }
