@@ -18,7 +18,7 @@ D.M. Young, R.T. Gregory A Survey of Numerical Mathematics (Volume 1), Chapter 6
 !*/
 
 use crate::ffi::FFI;
-use crate::Error;
+use crate::{Error, InterpAccel};
 
 ffi_wrapper!(Interp2d, *mut sys::gsl_interp2d, gsl_interp2d_free);
 
@@ -134,5 +134,102 @@ ffi_wrapper!(
 );
 
 impl Spline2d {
-    // TODO
+    #[doc(alias = "gsl_spline2d_alloc")]
+    pub fn new(t: Interp2dType, xsize: usize, ysize: usize) -> Option<Spline2d> {
+        let tmp = unsafe { sys::gsl_spline2d_alloc(t.unwrap_shared(), xsize, ysize) };
+
+        if tmp.is_null() {
+            None
+        } else {
+            Some(Self::wrap(tmp))
+        }
+    }
+
+    #[doc(alias = "gsl_spline2d_init")]
+    pub fn init(&mut self, xa: &[f64], ya: &[f64], za: &[f64]) -> Result<(), Error> {
+        let ret = unsafe {
+            sys::gsl_spline2d_init(
+                self.unwrap_unique(),
+                xa.as_ptr(),
+                ya.as_ptr(),
+                za.as_ptr(),
+                xa.len() as _,
+                ya.len() as _,
+            )
+        };
+        Error::handle(ret, ())
+    }
+
+    #[doc(alias = "gsl_spline2d_name")]
+    pub fn name(&self) -> String {
+        let tmp = unsafe { sys::gsl_spline2d_name(self.unwrap_shared()) };
+
+        if tmp.is_null() {
+            String::new()
+        } else {
+            unsafe { String::from_utf8_lossy(std::ffi::CStr::from_ptr(tmp).to_bytes()).to_string() }
+        }
+    }
+
+    #[doc(alias = "gsl_spline2d_min_size")]
+    pub fn min_size(&self) -> usize {
+        unsafe { sys::gsl_spline2d_min_size(self.unwrap_shared()) }
+    }
+
+    #[doc(alias = "gsl_spline2d_eval")]
+    pub fn eval(&self, x: f64, y: f64, xacc: &mut InterpAccel, yacc: &mut InterpAccel) -> f64 {
+        unsafe { sys::gsl_spline2d_eval(self.unwrap_shared(), x, y, &mut xacc.0, &mut yacc.0) }
+    }
+
+    /// Returns `z`.
+    #[doc(alias = "gsl_spline2d_eval_e")]
+    pub fn eval_e(
+        &self,
+        x: f64,
+        y: f64,
+        xacc: &mut InterpAccel,
+        yacc: &mut InterpAccel,
+    ) -> Result<f64, Error> {
+        let mut z = 0.;
+        let ret = unsafe {
+            sys::gsl_spline2d_eval_e(self.unwrap_shared(), x, y, &mut xacc.0, &mut yacc.0, &mut z)
+        };
+        Error::handle(ret, z)
+    }
+
+    #[doc(alias = "gsl_spline2d_eval")]
+    pub fn eval_extrap(
+        &self,
+        x: f64,
+        y: f64,
+        xacc: &mut InterpAccel,
+        yacc: &mut InterpAccel,
+    ) -> f64 {
+        unsafe {
+            sys::gsl_spline2d_eval_extrap(self.unwrap_shared(), x, y, &mut xacc.0, &mut yacc.0)
+        }
+    }
+
+    /// Returns `z`.
+    #[doc(alias = "gsl_spline2d_eval_extrap_e")]
+    pub fn eval_extrap_e(
+        &self,
+        x: f64,
+        y: f64,
+        xacc: &mut InterpAccel,
+        yacc: &mut InterpAccel,
+    ) -> Result<f64, Error> {
+        let mut z = 0.;
+        let ret = unsafe {
+            sys::gsl_spline2d_eval_extrap_e(
+                self.unwrap_shared(),
+                x,
+                y,
+                &mut xacc.0,
+                &mut yacc.0,
+                &mut z,
+            )
+        };
+        Error::handle(ret, z)
+    }
 }
