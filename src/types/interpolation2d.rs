@@ -232,4 +232,184 @@ impl Spline2d {
         };
         Error::handle(ret, z)
     }
+
+    #[doc(alias = "gsl_spline2d_eval_deriv_x")]
+    pub fn eval_deriv_x(
+        &self,
+        x: f64,
+        y: f64,
+        xacc: &mut InterpAccel,
+        yacc: &mut InterpAccel,
+    ) -> f64 {
+        unsafe {
+            sys::gsl_spline2d_eval_deriv_x(self.unwrap_shared(), x, y, &mut xacc.0, &mut yacc.0)
+        }
+    }
+
+    /// Returns `z`.
+    #[doc(alias = "gsl_spline2d_eval_deriv_x_e")]
+    pub fn eval_extrap_deriv_x_e(
+        &self,
+        x: f64,
+        y: f64,
+        xacc: &mut InterpAccel,
+        yacc: &mut InterpAccel,
+    ) -> Result<f64, Error> {
+        let mut d = 0.;
+        let ret = unsafe {
+            sys::gsl_spline2d_eval_deriv_x_e(
+                self.unwrap_shared(),
+                x,
+                y,
+                &mut xacc.0,
+                &mut yacc.0,
+                &mut d,
+            )
+        };
+        Error::handle(ret, d)
+    }
+
+    #[doc(alias = "gsl_spline2d_eval_deriv_y")]
+    pub fn eval_deriv_y(
+        &self,
+        x: f64,
+        y: f64,
+        xacc: &mut InterpAccel,
+        yacc: &mut InterpAccel,
+    ) -> f64 {
+        unsafe {
+            sys::gsl_spline2d_eval_deriv_y(self.unwrap_shared(), x, y, &mut xacc.0, &mut yacc.0)
+        }
+    }
+
+    /// Returns `z`.
+    #[doc(alias = "gsl_spline2d_eval_deriv_y_e")]
+    pub fn eval_extrap_deriv_y_e(
+        &self,
+        x: f64,
+        y: f64,
+        xacc: &mut InterpAccel,
+        yacc: &mut InterpAccel,
+    ) -> Result<f64, Error> {
+        let mut d = 0.;
+        let ret = unsafe {
+            sys::gsl_spline2d_eval_deriv_y_e(
+                self.unwrap_shared(),
+                x,
+                y,
+                &mut xacc.0,
+                &mut yacc.0,
+                &mut d,
+            )
+        };
+        Error::handle(ret, d)
+    }
+
+    #[doc(alias = "gsl_spline2d_eval_deriv_xx")]
+    pub fn eval_deriv_xx(
+        &self,
+        x: f64,
+        y: f64,
+        xacc: &mut InterpAccel,
+        yacc: &mut InterpAccel,
+    ) -> f64 {
+        unsafe {
+            sys::gsl_spline2d_eval_deriv_xx(self.unwrap_shared(), x, y, &mut xacc.0, &mut yacc.0)
+        }
+    }
+
+    /// Returns `z`.
+    #[doc(alias = "gsl_spline2d_eval_deriv_xx_e")]
+    pub fn eval_extrap_deriv_xx_e(
+        &self,
+        x: f64,
+        y: f64,
+        xacc: &mut InterpAccel,
+        yacc: &mut InterpAccel,
+    ) -> Result<f64, Error> {
+        let mut d = 0.;
+        let ret = unsafe {
+            sys::gsl_spline2d_eval_deriv_xx_e(
+                self.unwrap_shared(),
+                x,
+                y,
+                &mut xacc.0,
+                &mut yacc.0,
+                &mut d,
+            )
+        };
+        Error::handle(ret, d)
+    }
+
+    #[doc(alias = "gsl_spline2d_eval_deriv_yy")]
+    pub fn eval_deriv_yy(
+        &self,
+        x: f64,
+        y: f64,
+        xacc: &mut InterpAccel,
+        yacc: &mut InterpAccel,
+    ) -> f64 {
+        unsafe {
+            sys::gsl_spline2d_eval_deriv_yy(self.unwrap_shared(), x, y, &mut xacc.0, &mut yacc.0)
+        }
+    }
+
+    /// Returns `z`.
+    #[doc(alias = "gsl_spline2d_eval_deriv_yy_e")]
+    pub fn eval_extrap_deriv_yy_e(
+        &self,
+        x: f64,
+        y: f64,
+        xacc: &mut InterpAccel,
+        yacc: &mut InterpAccel,
+    ) -> Result<f64, Error> {
+        let mut d = 0.;
+        let ret = unsafe {
+            sys::gsl_spline2d_eval_deriv_yy_e(
+                self.unwrap_shared(),
+                x,
+                y,
+                &mut xacc.0,
+                &mut yacc.0,
+                &mut d,
+            )
+        };
+        Error::handle(ret, d)
+    }
+
+    #[doc(alias = "gsl_spline2d_eval_deriv_xy")]
+    pub fn eval_deriv_xy(
+        &self,
+        x: f64,
+        y: f64,
+        xacc: &mut InterpAccel,
+        yacc: &mut InterpAccel,
+    ) -> f64 {
+        unsafe {
+            sys::gsl_spline2d_eval_deriv_xy(self.unwrap_shared(), x, y, &mut xacc.0, &mut yacc.0)
+        }
+    }
+
+    /// Returns `z`.
+    #[doc(alias = "gsl_spline2d_eval_deriv_xy_e")]
+    pub fn eval_extrap_deriv_xy_e(
+        &self,
+        x: f64,
+        y: f64,
+        xacc: &mut InterpAccel,
+        yacc: &mut InterpAccel,
+    ) -> Result<f64, Error> {
+        let mut d = 0.;
+        let ret = unsafe {
+            sys::gsl_spline2d_eval_deriv_xy_e(
+                self.unwrap_shared(),
+                x,
+                y,
+                &mut xacc.0,
+                &mut yacc.0,
+                &mut d,
+            )
+        };
+        Error::handle(ret, d)
+    }
 }
