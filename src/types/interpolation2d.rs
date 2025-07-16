@@ -11,9 +11,7 @@ section compute a continuous interpolation function z(x,y) such that z(x_i, y_j)
 
 # 2d Interpolation algorithms
 
-The 2d Interpolation routines access the function values z_ij with the following ordering:
-
-        z_ij = za[j*xsize + i]
+The 2d Interpolation routines access the function values z_ij with the following ordering: z_ij = za[j*xsize + i]
 
 with i=0,...,xsize-1, and j=0,...,ysize-1. However, for ease of use, the functions [`set`], [`get`] and [`idx`]
 are provided to add and retrieve elements from the function grid without requiring knowledge of the internal
@@ -88,7 +86,7 @@ impl Interp2d {
     ///
     /// let interp2d_type = Interp2dType::bilinear();
     /// let interp2d = Interp2d::new(interp2d_type, 2, 2).expect("Failed to initialize `Interp2d`...");
-    /// println!("interp uses '{}' interpolation.", interp.name());
+    /// println!("interp uses '{}' interpolation.", interp2d.name());
     /// ```
     ///
     /// would print something like :
@@ -281,7 +279,7 @@ impl Spline2d {
 
     /// Returns `d`.
     #[doc(alias = "gsl_spline2d_eval_deriv_x_e")]
-    pub fn eval_extrap_deriv_x_e(
+    pub fn eval_deriv_x_e(
         &self,
         x: f64,
         y: f64,
@@ -317,7 +315,7 @@ impl Spline2d {
 
     /// Returns `d`.
     #[doc(alias = "gsl_spline2d_eval_deriv_y_e")]
-    pub fn eval_extrap_deriv_y_e(
+    pub fn eval_deriv_y_e(
         &self,
         x: f64,
         y: f64,
@@ -353,7 +351,7 @@ impl Spline2d {
 
     /// Returns `d`.
     #[doc(alias = "gsl_spline2d_eval_deriv_xx_e")]
-    pub fn eval_extrap_deriv_xx_e(
+    pub fn eval_deriv_xx_e(
         &self,
         x: f64,
         y: f64,
@@ -389,7 +387,7 @@ impl Spline2d {
 
     /// Returns `z`.
     #[doc(alias = "gsl_spline2d_eval_deriv_yy_e")]
-    pub fn eval_extrap_deriv_yy_e(
+    pub fn eval_deriv_yy_e(
         &self,
         x: f64,
         y: f64,
@@ -425,7 +423,7 @@ impl Spline2d {
 
     /// Returns `z`.
     #[doc(alias = "gsl_spline2d_eval_deriv_xy_e")]
-    pub fn eval_extrap_deriv_xy_e(
+    pub fn eval_deriv_xy_e(
         &self,
         x: f64,
         y: f64,
@@ -456,5 +454,89 @@ impl Spline2d {
     #[doc(alias = "gsl_interp2d_set")]
     pub fn get(&mut self, za: &mut [f64], i: usize, j: usize) -> f64 {
         unsafe { sys::gsl_spline2d_get(self.unwrap_shared(), za.as_mut_ptr(), i, j) }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_inter2d_type() {
+        let bilinear = Interp2dType::bilinear();
+        let bicubic = Interp2dType::bicubic();
+
+        bilinear.min_size();
+        bicubic.min_size();
+    }
+
+    #[test]
+    fn test_interp2d() {
+        let xa = vec![0.0, 1.0];
+        let ya = vec![2.0, 3.0];
+        let mut za = vec![4.0, 5.0, 6.0, 7.0];
+
+        let interp2d_type = Interp2dType::bilinear();
+        let mut interp2d = Interp2d::new(interp2d_type, 2, 2).unwrap();
+
+        interp2d.init(&xa, &ya, &za).unwrap();
+        interp2d.name();
+        interp2d.min_size();
+        interp2d.set(&mut za, 0, 1, 60.0);
+
+        assert_eq!(za, vec![4.0, 5.0, 60.0, 7.0]);
+        assert_eq!(interp2d.get(&mut za, 1, 1), 7.0);
+        assert_eq!(interp2d.idx(1, 1), 3);
+    }
+
+    #[test]
+    fn test_spline2d() {
+        let interp2d_type = Interp2dType::bilinear();
+
+        let xa = vec![0.0, 1.0];
+        let ya = vec![2.0, 3.0];
+        let mut za = vec![4.0, 5.0, 6.0, 7.0];
+        let mut xacc = InterpAccel::new();
+        let mut yacc = InterpAccel::new();
+
+        let mut spline2d = Spline2d::new(interp2d_type, 2, 2).unwrap();
+        spline2d.init(&xa, &ya, &za).unwrap();
+        spline2d.name();
+        spline2d.min_size();
+
+        spline2d.eval(0.5, 2.5, &mut xacc, &mut yacc);
+        spline2d.eval_extrap(0.5, 2.5, &mut xacc, &mut yacc);
+        spline2d.eval_deriv_x(0.5, 2.5, &mut xacc, &mut yacc);
+        spline2d.eval_deriv_y(0.5, 2.5, &mut xacc, &mut yacc);
+        spline2d.eval_deriv_xx(0.5, 2.5, &mut xacc, &mut yacc);
+        spline2d.eval_deriv_yy(0.5, 2.5, &mut xacc, &mut yacc);
+        spline2d.eval_deriv_xy(0.5, 2.5, &mut xacc, &mut yacc);
+
+        spline2d.eval_e(0.5, 2.5, &mut xacc, &mut yacc).unwrap();
+        spline2d
+            .eval_extrap_e(0.5, 2.5, &mut xacc, &mut yacc)
+            .unwrap();
+        spline2d
+            .eval_deriv_x_e(0.5, 2.5, &mut xacc, &mut yacc)
+            .unwrap();
+        spline2d
+            .eval_deriv_y_e(0.5, 2.5, &mut xacc, &mut yacc)
+            .unwrap();
+        spline2d
+            .eval_deriv_xx_e(0.5, 2.5, &mut xacc, &mut yacc)
+            .unwrap();
+        spline2d
+            .eval_deriv_yy_e(0.5, 2.5, &mut xacc, &mut yacc)
+            .unwrap();
+        spline2d
+            .eval_deriv_xy_e(0.5, 2.5, &mut xacc, &mut yacc)
+            .unwrap();
+
+        spline2d.name();
+        spline2d.min_size();
+        spline2d.set(&mut za, 0, 1, 60.0);
+
+        assert_eq!(za, vec![4.0, 5.0, 60.0, 7.0]);
+        assert_eq!(spline2d.get(&mut za, 1, 1), 7.0);
     }
 }

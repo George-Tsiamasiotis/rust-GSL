@@ -445,3 +445,39 @@ pub fn eval_deriv_xy_e(
     };
     Error::handle(ret, d)
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use crate::{Interp2d, Interp2dType, InterpAccel};
+
+    #[test]
+    fn test_interp2d_evals() {
+        let interp2d_type = Interp2dType::bilinear();
+        let mut interp2d = Interp2d::new(interp2d_type, 2, 2).unwrap();
+
+        let xa = vec![0.0, 1.0];
+        let ya = vec![2.0, 3.0];
+        let za = vec![4.0, 5.0, 6.0, 7.0];
+
+        interp2d.init(&xa, &ya, &za).unwrap();
+        let mut xacc = InterpAccel::new();
+        let mut yacc = InterpAccel::new();
+
+        eval(&interp2d, &xa, &ya, &za, 0.5, 2.5, &mut xacc, &mut yacc);
+        eval_extrap(&interp2d, &xa, &ya, &za, 0.5, 2.5, &mut xacc, &mut yacc);
+        eval_deriv_x(&interp2d, &xa, &ya, &za, 0.5, 2.5, &mut xacc, &mut yacc);
+        eval_deriv_y(&interp2d, &xa, &ya, &za, 0.5, 2.5, &mut xacc, &mut yacc);
+        eval_deriv_xx(&interp2d, &xa, &ya, &za, 0.5, 2.5, &mut xacc, &mut yacc);
+        eval_deriv_yy(&interp2d, &xa, &ya, &za, 0.5, 2.5, &mut xacc, &mut yacc);
+        eval_deriv_xy(&interp2d, &xa, &ya, &za, 0.5, 2.5, &mut xacc, &mut yacc);
+
+        eval_e(&interp2d, &xa, &ya, &za, 0.5, 2.5, &mut xacc, &mut yacc).unwrap();
+        eval_extrap_e(&interp2d, &xa, &ya, &za, 0.5, 2.5, &mut xacc, &mut yacc).unwrap();
+        eval_deriv_x_e(&interp2d, &xa, &ya, &za, 0.5, 2.5, &mut xacc, &mut yacc).unwrap();
+        eval_deriv_y_e(&interp2d, &xa, &ya, &za, 0.5, 2.5, &mut xacc, &mut yacc).unwrap();
+        eval_deriv_xx_e(&interp2d, &xa, &ya, &za, 0.5, 2.5, &mut xacc, &mut yacc).unwrap();
+        eval_deriv_yy_e(&interp2d, &xa, &ya, &za, 0.5, 2.5, &mut xacc, &mut yacc).unwrap();
+        eval_deriv_xy_e(&interp2d, &xa, &ya, &za, 0.5, 2.5, &mut xacc, &mut yacc).unwrap();
+    }
+}
